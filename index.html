@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Certificat de Formation</title>
+
+<style>
+body{
+margin:0;
+background:#d7dbe2;
+font-family:Georgia, serif;
+display:flex;
+flex-direction:column;
+align-items:center;
+padding:10px;
+}
+
+/* BOUTONS */
+.controls{
+margin-bottom:10px;
+display:flex;
+gap:6px;
+flex-wrap:wrap;
+}
+
+button{
+background:#c9a646;
+border:none;
+padding:7px 10px;
+color:white;
+font-weight:bold;
+border-radius:5px;
+cursor:pointer;
+}
+
+/* DOCUMENT */
+.page{
+width:100%;
+max-width:420px;
+background:white;
+padding:16px;
+position:relative;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+.frame{
+position:absolute;
+top:8px;left:8px;
+right:8px;bottom:8px;
+border:2px solid #c9a646;
+pointer-events:none;
+}
+
+/* TITRE */
+h2{
+text-align:center;
+color:#c9a646;
+font-size:16px;
+outline:none;
+}
+
+/* TEXTES */
+p{
+text-align:center;
+font-size:13px;
+}
+
+.edit{
+border-bottom:1px dotted #333;
+min-width:100px;
+display:inline-block;
+outline:none;
+}
+
+/* SIGNATURE */
+canvas{
+width:100%;
+height:80px;
+margin-top:10px;
+border-bottom:1px solid #000;
+}
+
+/* SIGNATAIRE */
+.signataire{
+text-align:center;
+font-size:12px;
+margin-top:5px;
+outline:none;
+}
+
+/* CACHET */
+.stamp{
+width:70px;
+height:70px;
+border:2px solid red;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:8px;
+color:red;
+font-weight:bold;
+transform:rotate(-8deg);
+margin-top:10px;
+}
+
+/* POPUP CODE */
+#popup{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.85);
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+#popup div{
+background:white;
+padding:20px;
+border-radius:10px;
+text-align:center;
+width:90%;
+max-width:300px;
+}
+
+#popup input{
+padding:8px;
+width:100%;
+margin-top:10px;
+text-align:center;
+}
+
+/* FOOTER CREATION */
+.footer{
+text-align:center;
+font-size:10px;
+margin-top:12px;
+color:#888;
+}
+.footer b{
+color:#c9a646;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🔐 POPUP CODE -->
+<div id="popup">
+<div>
+<h3>Code requis</h3>
+<p>Entrer le code pour télécharger</p>
+<input id="codeInput" placeholder="Code 233">
+<br><br>
+<button onclick="validateAndDownload()">Valider</button>
+</div>
+</div>
+
+<!-- 🔘 BOUTONS -->
+<div class="controls">
+<button onclick="toggleType()">Diplôme / Attestation</button>
+<button onclick="checkBeforeDownload()">Télécharger PDF</button>
+</div>
+
+<div class="page" id="doc">
+
+<div class="frame"></div>
+
+<h2 id="title" contenteditable="true">CERTIFICAT DE FIN DE FORMATION</h2>
+
+<p contenteditable="true"><b>[Nom de l'Institution]</b></p>
+
+<p>
+Certifie que <b contenteditable="true">M./Mme <span class="edit"></span></b>
+a suivi avec succès la formation en <b contenteditable="true"><span class="edit"></span></b>
+dispensée du <b contenteditable="true"><span class="edit"></span></b>
+au <b contenteditable="true"><span class="edit"></span></b>.
+</p>
+
+<p>
+Cette formation a permis à <b contenteditable="true">M./Mme <span class="edit"></span></b>
+d’acquérir les compétences nécessaires pour exercer le métier de
+<b contenteditable="true"><span class="edit"></span></b>.
+</p>
+
+<p>
+Fait à <span class="edit" contenteditable="true"></span>,
+le <span class="edit" contenteditable="true"></span>
+</p>
+
+<!-- SIGNATURE -->
+<canvas id="pad"></canvas>
+
+<div class="signataire" contenteditable="true">
+Nom du signataire
+</div>
+
+<div class="stamp" contenteditable="true">
+CACHET OFFICIEL
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+Créé par <b>ETS Lesfacilitateurs Groupe</b> — WhatsApp +237670035609
+</div>
+
+</div>
+
+<script>
+
+let codeOK=false;
+
+/* SWITCH */
+let mode=true;
+function toggleType(){
+document.getElementById("title").innerText =
+mode ? "ATTESTATION DE FORMATION" : "CERTIFICAT DE FIN DE FORMATION";
+mode=!mode;
+}
+
+/* SIGNATURE */
+const pad=document.getElementById("pad");
+const ctx=pad.getContext("2d");
+
+pad.width=pad.offsetWidth;
+pad.height=pad.offsetHeight;
+
+let drawing=false;
+
+pad.addEventListener("mousedown",()=>{drawing=true;ctx.beginPath();});
+pad.addEventListener("mouseup",()=>drawing=false);
+pad.addEventListener("mousemove",draw);
+
+pad.addEventListener("touchstart",()=>{drawing=true;ctx.beginPath();});
+pad.addEventListener("touchend",()=>drawing=false);
+pad.addEventListener("touchmove",draw);
+
+function draw(e){
+if(!drawing)return;
+let r=pad.getBoundingClientRect();
+let x=e.touches?e.touches[0].clientX-r.left:e.offsetX;
+let y=e.touches?e.touches[0].clientY-r.top:e.offsetY;
+ctx.lineWidth=2;
+ctx.lineCap="round";
+ctx.lineTo(x,y);
+ctx.stroke();
+}
+
+/* PDF */
+function downloadPDF(){
+
+let s=document.createElement("script");
+s.src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+
+s.onload=function(){
+html2pdf().set({
+filename:"certificat_233.pdf",
+jsPDF:{unit:'mm',format:'a5'}
+}).from(document.getElementById("doc")).save();
+};
+
+document.body.appendChild(s);
+}
+
+/* OUVRIR POPUP */
+function checkBeforeDownload(){
+document.getElementById("popup").style.display="flex";
+}
+
+/* VALIDATION CODE */
+function validateAndDownload(){
+
+let code=document.getElementById("codeInput").value.replace(/\s+/g,"").trim();
+
+if(code==="233"){
+document.getElementById("popup").style.display="none";
+downloadPDF();
+}else{
+alert("Code incorrect ❌");
+}
+}
+
+</script>
+
+</body>
+                             </html>
