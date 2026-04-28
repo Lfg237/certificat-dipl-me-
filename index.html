@@ -34,20 +34,20 @@ border-radius:5px;
 cursor:pointer;
 }
 
-/* DOCUMENT */
+/* 📄 PAGE AGRANDIE */
 .page{
 width:100%;
-max-width:600px;
+max-width:800px;   /* 🔥 PLUS GRAND */
 background:white;
-padding:16px;
+padding:25px;
 position:relative;
 box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
 
 .frame{
 position:absolute;
-top:8px;left:8px;
-right:8px;bottom:8px;
+top:10px;left:10px;
+right:10px;bottom:10px;
 border:2px solid #c9a646;
 pointer-events:none;
 }
@@ -56,19 +56,20 @@ pointer-events:none;
 h2{
 text-align:center;
 color:#c9a646;
-font-size:16px;
+font-size:20px;
 outline:none;
 }
 
-/* TEXTES */
+/* TEXTE */
 p{
 text-align:center;
-font-size:13px;
+font-size:14px;
+line-height:1.5;
 }
 
 .edit{
 border-bottom:1px dotted #333;
-min-width:100px;
+min-width:120px;
 display:inline-block;
 outline:none;
 }
@@ -76,29 +77,29 @@ outline:none;
 /* SIGNATURE */
 canvas{
 width:100%;
-height:80px;
-margin-top:10px;
+height:100px;
+margin-top:15px;
 border-bottom:1px solid #000;
 }
 
 /* SIGNATAIRE */
 .signataire{
 text-align:center;
-font-size:12px;
+font-size:13px;
 margin-top:5px;
 outline:none;
 }
 
 /* CACHET */
 .stamp{
-width:70px;
-height:70px;
+width:80px;
+height:80px;
 border:2px solid red;
 border-radius:50%;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:8px;
+font-size:9px;
 color:red;
 font-weight:bold;
 transform:rotate(-8deg);
@@ -133,12 +134,12 @@ margin-top:10px;
 text-align:center;
 }
 
-/* FOOTER CREATION */
+/* FOOTER */
 .footer{
 text-align:center;
-font-size:10px;
-margin-top:12px;
-color:#888;
+font-size:11px;
+margin-top:15px;
+color:#666;
 }
 .footer b{
 color:#c9a646;
@@ -152,7 +153,7 @@ color:#c9a646;
 <div id="popup">
 <div>
 <h3>Code requis</h3>
-<p>Entrer le code pour télécharger</p>
+<p>Entrer le code 233 pour télécharger</p>
 <input id="codeInput" placeholder="Code 233">
 <br><br>
 <button onclick="validateAndDownload()">Valider</button>
@@ -211,24 +212,24 @@ Créé par <b>ETS Lesfacilitateurs Groupe</b> — WhatsApp +237670035609
 
 <script>
 
-let codeOK=false;
+let codeOK = false;
 
 /* SWITCH */
-let mode=true;
+let mode = true;
 function toggleType(){
 document.getElementById("title").innerText =
 mode ? "ATTESTATION DE FORMATION" : "CERTIFICAT DE FIN DE FORMATION";
-mode=!mode;
+mode = !mode;
 }
 
 /* SIGNATURE */
-const pad=document.getElementById("pad");
-const ctx=pad.getContext("2d");
+const pad = document.getElementById("pad");
+const ctx = pad.getContext("2d");
 
-pad.width=pad.offsetWidth;
-pad.height=pad.offsetHeight;
+pad.width = pad.offsetWidth;
+pad.height = pad.offsetHeight;
 
-let drawing=false;
+let drawing = false;
 
 pad.addEventListener("mousedown",()=>{drawing=true;ctx.beginPath();});
 pad.addEventListener("mouseup",()=>drawing=false);
@@ -240,11 +241,11 @@ pad.addEventListener("touchmove",draw);
 
 function draw(e){
 if(!drawing)return;
-let r=pad.getBoundingClientRect();
-let x=e.touches?e.touches[0].clientX-r.left:e.offsetX;
-let y=e.touches?e.touches[0].clientY-r.top:e.offsetY;
-ctx.lineWidth=2;
-ctx.lineCap="round";
+let r = pad.getBoundingClientRect();
+let x = e.touches ? e.touches[0].clientX - r.left : e.offsetX;
+let y = e.touches ? e.touches[0].clientY - r.top : e.offsetY;
+ctx.lineWidth = 2;
+ctx.lineCap = "round";
 ctx.lineTo(x,y);
 ctx.stroke();
 }
@@ -252,31 +253,37 @@ ctx.stroke();
 /* PDF */
 function downloadPDF(){
 
-let s=document.createElement("script");
-s.src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+let s = document.createElement("script");
+s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
 
-s.onload=function(){
+s.onload = function(){
 html2pdf().set({
 filename:"certificat_233.pdf",
-jsPDF:{unit:'mm',format:'a4'}
+jsPDF:{
+unit:'mm',
+format:'a4'   // 🔥 A4 PRO
+},
+html2canvas:{
+scale:2       // 🔥 AGRANDIT + QUALITÉ
+}
 }).from(document.getElementById("doc")).save();
 };
 
 document.body.appendChild(s);
 }
 
-/* OUVRIR POPUP */
+/* POPUP */
 function checkBeforeDownload(){
-document.getElementById("popup").style.display="flex";
+document.getElementById("popup").style.display = "flex";
 }
 
 /* VALIDATION CODE */
 function validateAndDownload(){
 
-let code=document.getElementById("codeInput").value.replace(/\s+/g,"").trim();
+let code = document.getElementById("codeInput").value.replace(/\s+/g,"").trim();
 
-if(code==="233"){
-document.getElementById("popup").style.display="none";
+if(code === "233"){
+document.getElementById("popup").style.display = "none";
 downloadPDF();
 }else{
 alert("Code incorrect ❌");
@@ -286,4 +293,4 @@ alert("Code incorrect ❌");
 </script>
 
 </body>
-                             </html>
+</html>
